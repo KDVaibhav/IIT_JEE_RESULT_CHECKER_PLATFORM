@@ -18,9 +18,9 @@ WORKDIR /backend
 
 RUN npm install -g pnpm
 
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+COPY --from=build /backend/package*.json ./
+COPY --from=build /backend/node_modules ./node_modules
+COPY --from=build /backend/dist ./dist
 
 EXPOSE 5000
 
