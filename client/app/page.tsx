@@ -94,7 +94,7 @@ export default function ResultForm() {
         >
           <input
             type="text"
-            placeholder="Enter Hall Ticket Number"
+            placeholder="Enter Hall Ticket Number eq. HT000078 or HT000345"
             value={hallTicket}
             onChange={(e) => setHallTicket(e.target.value)}
             className="text-slate-500 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
