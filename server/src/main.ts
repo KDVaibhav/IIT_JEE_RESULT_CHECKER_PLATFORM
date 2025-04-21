@@ -6,11 +6,15 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   }); // Enable detailed logs
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000' || '',
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
+    origin: [
+      'http://localhost:3000',
+      'https://iit-jee-result-checker-platform.vercel.app',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: false, // Since there's no authentication
   });
+  
   await app.listen(5000);
   if (module.hot) {
     module.hot.accept();
