@@ -6,9 +6,21 @@ import { fetchResultByHallTicket } from "@/lib/api";
 import { jsPDF } from "jspdf";
 import { Loader2, Download } from "lucide-react";
 
+interface ResultType {
+  name: string;
+  email: string;
+  hallTicketNo: string;
+  rank: number;
+  maths: number;
+  physics: number;
+  chemistry: number;
+  total: number;
+  pass: boolean;
+}
+
 export default function SharedResultPage() {
   const { hallTicketNo } = useParams() as { hallTicketNo: string };
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ResultType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -19,8 +31,12 @@ export default function SharedResultPage() {
       try {
         const data = await fetchResultByHallTicket(hallTicketNo);
         setResult(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load result.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Failed to fetch results. Please try again.");
+        }
       } finally {
         setLoading(false);
       }

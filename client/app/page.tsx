@@ -5,12 +5,24 @@ import { fetchResultByHallTicket } from "@/lib/api";
 import { Loader2, Search, Download } from "lucide-react";
 import { jsPDF } from "jspdf";
 
+interface ResultType {
+  name: string;
+  email: string;
+  hallTicketNo: string;
+  rank: number;
+  maths: number;
+  physics: number;
+  chemistry: number;
+  total: number;
+  pass: boolean;
+}
+
 export default function ResultForm() {
   const [hallTicket, setHallTicket] = useState("");
   const [loading, setLoading] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
+  const pdfLoading = false;
   const [error, setError] = useState("");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ResultType | null>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,8 +36,12 @@ export default function ResultForm() {
     try {
       const data = await fetchResultByHallTicket(hallTicket.trim());
       setResult(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch results. Please try again.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to fetch results. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -42,25 +58,26 @@ export default function ResultForm() {
     doc.setFontSize(12);
     let y = 40;
     const lineHeight = 8;
-
-    doc.text(`Name: ${result.name}`, 20, y);
-    y += lineHeight;
-    doc.text(`Email: ${result.email}`, 20, y);
-    y += lineHeight;
-    doc.text(`Hall Ticket No: ${result.hallTicketNo}`, 20, y);
-    y += lineHeight;
-    doc.text(`Maths: ${result.maths}`, 20, y);
-    y += lineHeight;
-    doc.text(`Physics: ${result.physics}`, 20, y);
-    y += lineHeight;
-    doc.text(`Chemistry: ${result.chemistry}`, 20, y);
-    y += lineHeight;
-    doc.text(`Total Marks: ${result.total} / 210`, 20, y);
-    y += lineHeight;
-    doc.text(`Rank: ${result.rank}`, 20, y);
-    y += lineHeight;
-    doc.text(`Status: ${result.pass ? "Passed ✅" : "Failed ❌"}`, 20, y);
-    y += lineHeight;
+    if (result) {
+      doc.text(`Name: ${result.name}`, 20, y);
+      y += lineHeight;
+      doc.text(`Email: ${result.email}`, 20, y);
+      y += lineHeight;
+      doc.text(`Hall Ticket No: ${result.hallTicketNo}`, 20, y);
+      y += lineHeight;
+      doc.text(`Maths: ${result.maths}`, 20, y);
+      y += lineHeight;
+      doc.text(`Physics: ${result.physics}`, 20, y);
+      y += lineHeight;
+      doc.text(`Chemistry: ${result.chemistry}`, 20, y);
+      y += lineHeight;
+      doc.text(`Total Marks: ${result.total} / 210`, 20, y);
+      y += lineHeight;
+      doc.text(`Rank: ${result.rank}`, 20, y);
+      y += lineHeight;
+      doc.text(`Status: ${result.pass ? "Passed ✅" : "Failed ❌"}`, 20, y);
+      y += lineHeight;
+    }
     doc.save(`JEE_Result_${hallTicket}.pdf`);
   };
 
@@ -80,7 +97,7 @@ export default function ResultForm() {
             placeholder="Enter Hall Ticket Number"
             value={hallTicket}
             onChange={(e) => setHallTicket(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="text-slate-500 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
             required
           />
           <button
@@ -120,7 +137,7 @@ export default function ResultForm() {
               </p>
               <p>
                 <span className="font-medium">Hall Ticket:</span>{" "}
-                {result.hallTicket}
+                {result.hallTicketNo}
               </p>
               <p>
                 <span className="font-medium">Rank:</span> {result.rank}
